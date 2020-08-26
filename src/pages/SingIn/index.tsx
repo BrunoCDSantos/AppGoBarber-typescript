@@ -1,10 +1,13 @@
 import React, { useCallback, useRef } from 'react';
 import { Image, ScrollView, TextInput, Alert } from 'react-native';
-import * as Yup from 'yup';
 import Icons from 'react-native-vector-icons/Feather'
 import {useNavigation} from '@react-navigation/native'
 import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
+import * as Yup from 'yup';
+import api from '../../services/api';
+
+import {useAuth} from '../../hooks/AuthContext';
 
 import Input from '../../components/Input';
 import Button from '../../components/Button';
@@ -27,9 +30,7 @@ const SignIn: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
   const navigation = useNavigation();
 
-  const handleSignIn = useCallback((data:object) => {
-    console.log(data)
-  }, [])
+  const { signIn } = useAuth();
 
   const formSubmit = useCallback(
     async (data: SignInFormData) => {
@@ -46,12 +47,11 @@ const SignIn: React.FC = () => {
           abortEarly: false,
         });
 
-        //await signIn({
-     //     email: data.email,
-     //     password: data.password,
-     //   });
+        await signIn({
+          email: data.email,
+          password: data.password,
+        });
 
-     //   history.push('/dashbord');
       } catch (err) {
         if (err instanceof Yup.ValidationError) {
           const errors = getValidationErrors(err);
@@ -67,7 +67,7 @@ const SignIn: React.FC = () => {
 
       }
     },
-    [],
+    [signIn],
   );
 
 
@@ -83,18 +83,20 @@ const SignIn: React.FC = () => {
     <Container>
       <Image source={logoImg} />
       <Title> Faça seu logon </Title>
-      <Form  ref={formRef} onSubmit={ handleSignIn }>
+      <Form ref={formRef } onSubmit={ formSubmit } >
 
         <Input
+
           autoCorrect={false}
           autoCapitalize="none"
           keyboardType="email-address"
           name="email"
           icon="mail"
+
           placeholder="E-mail"
           returnKeyType="next"
           onSubmitEditing={() => {
-
+            passwordRef.current?.focus();
           }}
         />
         <Input
@@ -105,11 +107,11 @@ const SignIn: React.FC = () => {
           placeholder="Senha"
           returnKeyType="send"
           onSubmitEditing={() => {
-            formRef.current?.submitForm}}
+            formRef.current?.submitForm()}}
         />
 
       <Button onPress={ () => {
-        formRef.current?.submitForm
+        formRef.current?.submitForm()
       }}>
       Entrar </Button>
       </Form>

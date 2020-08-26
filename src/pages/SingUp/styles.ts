@@ -12,7 +12,7 @@ export const Title = styled.Text`
   font-size: 24px;
   color: #f4ede8;
   font-family: 'RobotoSlap-Mediun';
-  margin: 64px 0 24px
+  margin: 64px 0 24px;
 `;
 
 export const BackToSign = styled.TouchableOpacity`
